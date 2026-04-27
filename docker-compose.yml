@@ -1,9 +1,12 @@
 services:
-  tds-backend:
+  tds-engine:
     build: .
-    container_name: tds-backend
+    container_name: tds-engine
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data
+      - tds_data:/app/data
     restart: unless-stopped
+
+volumes:
+  tds_data:
