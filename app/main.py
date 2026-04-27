@@ -6,7 +6,6 @@ from app import models, schemas
 
 app = FastAPI()
 
-# создаём таблицы
 Base.metadata.create_all(bind=engine)
 
 
@@ -15,17 +14,15 @@ def root():
     return {"status": "ok"}
 
 
-#  создать ссылку
-@app.post("/links", response_model=schemas.LinkResponse)
-def create_link(link: schemas.LinkCreate, db: Session = Depends(get_db)):
-    db_link = models.Link(**link.dict())
-    db.add(db_link)
+@app.post("/projects", response_model=schemas.ProjectResponse)
+def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)):
+    db_project = models.Project(**project.model_dump())
+    db.add(db_project)
     db.commit()
-    db.refresh(db_link)
-    return db_link
+    db.refresh(db_project)
+    return db_project
 
 
-#  получить все ссылки
-@app.get("/links", response_model=list[schemas.LinkResponse])
-def get_links(db: Session = Depends(get_db)):
-    return db.query(models.Link).all()
+@app.get("/projects", response_model=list[schemas.ProjectResponse])
+def get_projects(db: Session = Depends(get_db)):
+    return db.query(models.Project).all()

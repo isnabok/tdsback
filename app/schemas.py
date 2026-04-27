@@ -1,19 +1,19 @@
 from pydantic import BaseModel
+from typing import Literal
 
 
-class LinkCreate(BaseModel):
-    slug: str
-    target_url: str
-    geo: str | None = None
-    device: str | None = None
+ProjectType = Literal["redirect", "direct", "protection"]
 
 
-class LinkResponse(BaseModel):
+class ProjectCreate(BaseModel):
+    name: str
+    type: ProjectType
+
+
+class ProjectResponse(BaseModel):
     id: int
-    slug: str
-    target_url: str
-    geo: str | None
-    device: str | None
+    name: str
+    type: str
 
     class Config:
         from_attributes = True

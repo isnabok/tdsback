@@ -2,11 +2,9 @@ from sqlalchemy import Column, Integer, String
 from app.database import Base
 
 
-class Link(Base):
-    __tablename__ = "links"
+class Project(Base):
+    __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True, index=True)
-    slug = Column(String, unique=True, index=True)
-    target_url = Column(String)
-    geo = Column(String, nullable=True)  # например: DE, PL
-    device = Column(String, nullable=True)  # mobile / desktop
+    name = Column(String, nullable=False)
+    type = Column(String, nullable=False, index=True)
