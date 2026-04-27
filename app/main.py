@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import engine, Base, get_db
@@ -26,3 +26,26 @@ def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)
 @app.get("/projects", response_model=list[schemas.ProjectResponse])
 def get_projects(db: Session = Depends(get_db)):
     return db.query(models.Project).all()
+
+@app.post("/routes", response_model=schemas.RouteResponse)
+def create_route(route: schemas.RouteCreate, db: Session = Depends(get_db)):
+    db_route = models.Route(**route.model_dump())
+    db.add(db_route)
+    db.commit()
+    db.refresh(db_route)
+    return db_route
+
+
+@app.get("/routes", response_model=list[schemas.RouteResponse])
+def get_routes(db: Session = Depends(get_db)):
+    return db.query(models.Route).all()
+
+
+@app.get("/routes/{slug}", response_model=schemas.RouteResponse)
+def get_route_by_slug(slug: str, db: Session = Depends(get_db)):
+    route = db.query(models.Route).filter(models.Route.slug == slug).first()
+
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+
+    return route

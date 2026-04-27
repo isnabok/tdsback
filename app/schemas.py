@@ -17,3 +17,19 @@ class ProjectResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class RouteCreate(BaseModel):
+    project_id: int
+    name: str
+    slug: str
+
+
+class RouteResponse(BaseModel):
+    id: int
+    project_id: int
+    name: str
+    slug: str
+
+    class Config:
+        from_attributes = True
