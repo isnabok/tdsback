@@ -20,7 +20,6 @@ class ProjectResponse(BaseModel):
 
 
 class RouteCreate(BaseModel):
-    project_id: int
     name: str
     slug: str
 
