@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from app.database import engine, Base, get_db
 from app import models, schemas
 
+import random
+from fastapi.responses import RedirectResponse
+
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
@@ -101,20 +104,22 @@ def traffic_entry(slug: str, db: Session = Depends(get_db)):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    return {
-        "status": "route_found",
-        "route": {
-            "id": route.id,
-            "name": route.name,
-            "slug": route.slug,
-        },
-        "project": {
-            "id": project.id,
-            "name": project.name,
-            "type": project.type,
-        },
-        "message": "Traffic entry point is working. Destination logic will be added later.",
-    }
+    destinations = db.query(models.Destination).filter(
+        models.Destination.project_id == project.id,
+        models.Destination.status == "active",
+        models.Destination.weight > 0,
+    ).all()
+
+    if not destinations:
+        raise HTTPException(status_code=404, detail="No active destinations")
+
+    destination = random.choices(
+        destinations,
+        weights=[d.weight for d in destinations],
+        k=1,
+    )[0]
+
+    return RedirectResponse(url=destination.url, status_code=302)
 
 
 @app.get("/projects/{project_id}/destinations", response_model=list[schemas.DestinationResponse])
