@@ -32,3 +32,22 @@ class RouteResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class DestinationCreate(BaseModel):
+    name: str
+    url: str
+    weight: int = 100
+    status: str = "active"
+
+
+class DestinationResponse(BaseModel):
+    id: int
+    project_id: int
+    name: str
+    url: str
+    weight: int
+    status: str
+
+    class Config:
+        from_attributes = True

@@ -115,3 +115,36 @@ def traffic_entry(slug: str, db: Session = Depends(get_db)):
         },
         "message": "Traffic entry point is working. Destination logic will be added later.",
     }
+
+
+@app.get("/projects/{project_id}/destinations", response_model=list[schemas.DestinationResponse])
+def get_project_destinations(project_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Destination).filter(
+        models.Destination.project_id == project_id
+    ).all()
+
+
+@app.post("/projects/{project_id}/destinations", response_model=schemas.DestinationResponse)
+def create_project_destination(
+    project_id: int,
+    destination: schemas.DestinationCreate,
+    db: Session = Depends(get_db),
+):
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    db_destination = models.Destination(
+        project_id=project_id,
+        name=destination.name,
+        url=str(destination.url),
+        weight=destination.weight,
+        status=destination.status,
+    )
+
+    db.add(db_destination)
+    db.commit()
+    db.refresh(db_destination)
+
+    return db_destination
