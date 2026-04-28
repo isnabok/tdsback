@@ -87,3 +87,31 @@ def create_project_route(
     db.refresh(db_route)
 
     return db_route
+
+
+@app.get("/r/{slug}")
+def traffic_entry(slug: str, db: Session = Depends(get_db)):
+    route = db.query(models.Route).filter(models.Route.slug == slug).first()
+
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+
+    project = db.query(models.Project).filter(models.Project.id == route.project_id).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    return {
+        "status": "route_found",
+        "route": {
+            "id": route.id,
+            "name": route.name,
+            "slug": route.slug,
+        },
+        "project": {
+            "id": project.id,
+            "name": project.name,
+            "type": project.type,
+        },
+        "message": "Traffic entry point is working. Destination logic will be added later.",
+    }
